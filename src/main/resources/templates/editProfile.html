@@ -1,0 +1,201 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Editar perfil médico</title>
+
+    <link rel="stylesheet" th:href="@{/css/output.css}" />
+  </head>
+
+  <body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
+    <div class="bg-white shadow-xl rounded-2xl p-8 w-full max-w-3xl">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">
+        Editar perfil médico
+      </h2>
+
+      <form
+        method="post"
+        th:action="@{/profile/{token}/update(token=${profile.token})}"
+        class="grid grid-cols-1 md:grid-cols-2 gap-6"
+      >
+        <div>
+          <label class="block text-sm font-medium text-gray-600">
+            Nombre completo
+          </label>
+
+          <input
+            name="name"
+            th:value="${profile.name}"
+            class="mt-1 w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600">
+            Fecha nacimiento
+          </label>
+
+          <input
+            type="date"
+            name="birthDate"
+            th:value="${profile.birthDate}"
+            class="mt-1 w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600">
+            Tipo de sangre
+          </label>
+
+          <input
+            name="bloodType"
+            th:value="${profile.bloodType}"
+            class="mt-1 w-full border rounded-lg px-4 py-2"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600">
+            Teléfono
+          </label>
+
+          <input
+            name="phone"
+            th:value="${profile.phone}"
+            class="mt-1 w-full border rounded-lg px-4 py-2"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600">
+            Correo
+          </label>
+
+          <input
+            type="email"
+            name="email"
+            th:value="${profile.email}"
+            class="mt-1 w-full border rounded-lg px-4 py-2"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600">
+            Contacto emergencia
+          </label>
+
+          <input
+            name="emergencyContactName"
+            th:value="${profile.emergencyContactName}"
+            class="mt-1 w-full border rounded-lg px-4 py-2"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600">
+            Teléfono emergencia
+          </label>
+
+          <input
+            name="emergencyContactPhone"
+            th:value="${profile.emergencyContactPhone}"
+            class="mt-1 w-full border rounded-lg px-4 py-2"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600">
+            Relación
+          </label>
+
+          <input
+            name="emergencyContactRelation"
+            th:value="${profile.emergencyContactRelation}"
+            class="mt-1 w-full border rounded-lg px-4 py-2"
+          />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-600">
+            Alergias
+          </label>
+
+          <textarea
+            name="allergies"
+            class="mt-1 w-full border rounded-lg px-4 py-2"
+            th:text="${profile.allergies}"
+          ></textarea>
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-600">
+            Enfermedades crónicas
+          </label>
+
+          <textarea
+            name="chronicDiseases"
+            class="mt-1 w-full border rounded-lg px-4 py-2"
+            th:text="${profile.chronicDiseases}"
+          ></textarea>
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-600">
+            Medicamentos
+          </label>
+
+          <textarea
+            name="medications"
+            class="mt-1 w-full border rounded-lg px-4 py-2"
+            th:text="${profile.medications}"
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600">
+            Seguro médico
+          </label>
+
+          <input
+            name="insuranceProvider"
+            th:value="${profile.insuranceProvider}"
+            class="mt-1 w-full border rounded-lg px-4 py-2"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-600">
+            Número seguro
+          </label>
+
+          <input
+            name="insuranceNumber"
+            th:value="${profile.insuranceNumber}"
+            class="mt-1 w-full border rounded-lg px-4 py-2"
+          />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-600">
+            Confirmar contraseña
+          </label>
+
+          <input
+            type="password"
+            name="password"
+            class="mt-1 w-full border rounded-lg px-4 py-2"
+          />
+        </div>
+
+        <div class="md:col-span-2">
+          <button
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md transition"
+          >
+            Actualizar perfil
+          </button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

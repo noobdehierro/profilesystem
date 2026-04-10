@@ -1,0 +1,285 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Perfil médico</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}" />
+  </head>
+
+  <body class="bg-gray-100 min-h-screen py-10 px-4">
+    <div class="max-w-3xl mx-auto">
+      <div
+        class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200"
+      >
+        <!-- Header con foto y nombre -->
+        <div
+          class="bg-gray-50 border-b border-gray-200 px-6 py-5 flex items-center gap-4"
+        >
+          <div
+            class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-semibold text-lg overflow-hidden flex-shrink-0"
+          >
+            <img
+              th:src="${photoUrl}"
+              src="https://i.pravatar.cc/300?img=32"
+              alt="Foto de perfil"
+              class="w-full h-full object-cover"
+              onerror="this.style.display = 'none'"
+            />
+          </div>
+          <div>
+            <p class="text-gray-900 font-semibold text-base leading-tight">
+              <span th:text="${name}">Daniela Torres Méndez</span>
+              <span
+                class="ml-2 inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-0.5 rounded-full"
+                th:text="${bloodType}"
+                >A-</span
+              >
+            </p>
+            <p class="text-gray-500 text-sm mt-0.5">
+              Paciente activa ·
+              <span th:text="${insuranceProvider}">Seguro Popular</span>
+            </p>
+          </div>
+        </div>
+
+        <form method="post" th:action="@{/profile/{token}(token=${token})}">
+          <!-- Datos personales -->
+          <div class="px-6 py-5 border-b border-gray-200">
+            <p
+              class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4"
+            >
+              Datos personales
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1"
+                  >Nombre completo</label
+                >
+                <input
+                  name="name"
+                  th:value="${name}"
+                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1"
+                  >Fecha de nacimiento</label
+                >
+                <input
+                  type="date"
+                  name="birthDate"
+                  th:value="${birthDate}"
+                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1"
+                  >Teléfono</label
+                >
+                <input
+                  name="phone"
+                  th:value="${phone}"
+                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1"
+                  >Correo electrónico</label
+                >
+                <input
+                  type="email"
+                  name="email"
+                  th:value="${email}"
+                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-xs font-medium text-gray-500 mb-1"
+                  >Dirección</label
+                >
+                <input
+                  name="address"
+                  th:value="${address}"
+                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Información médica -->
+          <div class="px-6 py-5 border-b border-gray-200">
+            <p
+              class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4"
+            >
+              Información médica
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1"
+                  >Tipo de sangre</label
+                >
+                <input
+                  name="bloodType"
+                  th:value="${bloodType}"
+                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-xs font-medium text-gray-500 mb-1"
+                  >Alergias</label
+                >
+                <textarea
+                  name="allergies"
+                  th:text="${allergies}"
+                  rows="2"
+                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                ></textarea>
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-xs font-medium text-gray-500 mb-1"
+                  >Enfermedades crónicas</label
+                >
+                <textarea
+                  name="chronicDiseases"
+                  th:text="${chronicDiseases}"
+                  rows="2"
+                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                ></textarea>
+              </div>
+
+              <div class="md:col-span-2">
+                <label class="block text-xs font-medium text-gray-500 mb-1"
+                  >Medicamentos actuales</label
+                >
+                <textarea
+                  name="medications"
+                  th:text="${medications}"
+                  rows="2"
+                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seguro médico -->
+          <div class="px-6 py-5 border-b border-gray-200">
+            <p
+              class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4"
+            >
+              Seguro médico
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1"
+                  >Proveedor</label
+                >
+                <input
+                  name="insuranceProvider"
+                  th:value="${insuranceProvider}"
+                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1"
+                  >Número de póliza</label
+                >
+                <input
+                  name="insuranceNumber"
+                  th:value="${insuranceNumber}"
+                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Contacto de emergencia -->
+          <div class="px-6 py-5 border-b border-gray-200">
+            <p
+              class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4"
+            >
+              Contacto de emergencia
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1"
+                  >Nombre</label
+                >
+                <input
+                  name="emergencyContactName"
+                  th:value="${emergencyContactName}"
+                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1"
+                  >Teléfono</label
+                >
+                <input
+                  name="emergencyContactPhone"
+                  th:value="${emergencyContactPhone}"
+                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1"
+                  >Relación</label
+                >
+                <input
+                  name="emergencyContactRelation"
+                  th:value="${emergencyContactRelation}"
+                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Seguridad -->
+          <div class="px-6 py-5 border-b border-gray-200">
+            <p
+              class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4"
+            >
+              Seguridad
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1"
+                  >Contraseña</label
+                >
+                <input
+                  type="password"
+                  name="password"
+                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Acciones -->
+          <div class="px-6 py-4 flex justify-end gap-3 bg-gray-50">
+            <button
+              type="button"
+              class="px-5 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-sm"
+            >
+              Guardar perfil
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
