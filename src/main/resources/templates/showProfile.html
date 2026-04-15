@@ -2,168 +2,216 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Perfil médico</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}" href="/css/output.css" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      * { font-family: 'DM Sans', sans-serif; }
+      code, .mono { font-family: 'DM Mono', monospace; }
 
-    <link rel="stylesheet" href="/css/output.css" />
+      body {
+        background: #0a0f1e;
+        background-image:
+          radial-gradient(ellipse 60% 40% at 50% -10%, rgba(99,102,241,0.18) 0%, transparent 70%),
+          radial-gradient(ellipse 40% 30% at 90% 80%, rgba(168,85,247,0.10) 0%, transparent 60%);
+      }
+
+      /* Hero card gradient */
+      .hero-card {
+        background: linear-gradient(135deg, #312e81 0%, #4c1d95 50%, #1e1b4b 100%);
+        position: relative;
+        overflow: hidden;
+      }
+      .hero-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.6;
+      }
+
+      /* Avatar ring pulse */
+      .avatar-ring {
+        box-shadow: 0 0 0 3px rgba(165,180,252,0.4), 0 0 0 6px rgba(165,180,252,0.1);
+      }
+
+      /* Tabs */
+      .tab-btn {
+        transition: all 0.2s ease;
+        border-bottom: 2px solid transparent;
+        white-space: nowrap;
+      }
+      .tab-btn.active {
+        color: #818cf8;
+        border-bottom-color: #818cf8;
+      }
+      .tab-btn:not(.active) {
+        color: #6b7280;
+      }
+      .tab-panel { display: none; }
+      .tab-panel.active { display: block; }
+
+      /* Cards */
+      .info-card {
+        background: rgba(17, 24, 39, 0.8);
+        border: 1px solid rgba(55, 65, 81, 0.6);
+        backdrop-filter: blur(8px);
+      }
+
+      /* Blood type badge */
+      .blood-badge {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        box-shadow: 0 0 12px rgba(220,38,38,0.4);
+      }
+
+      /* Password form */
+      .edit-input {
+        background: rgba(31, 41, 55, 0.8);
+        border: 1px solid rgba(75, 85, 99, 0.6);
+        color: white;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .edit-input:focus {
+        outline: none;
+        border-color: #818cf8;
+        box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
+      }
+      .edit-input::placeholder { color: #6b7280; }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        transition: opacity 0.2s, transform 0.15s;
+        box-shadow: 0 4px 20px rgba(99,102,241,0.35);
+      }
+      .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+      .btn-primary:active { transform: translateY(0); }
+
+      /* Label */
+      .data-label { color: #6b7280; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+      .data-value { color: #e5e7eb; font-size: 0.95rem; font-weight: 500; }
+    </style>
   </head>
 
-  <body
-    class="bg-gradient-to-br from-gray-950 via-gray-900 to-black min-h-screen flex items-center justify-center px-4 text-white"
-  >
-    <div class="max-w-3xl w-full">
-      <!-- HEADER CARD -->
-      <div
-        class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl shadow-2xl p-8 text-center relative"
-      >
-        <div class="absolute inset-0 bg-black opacity-10 rounded-3xl"></div>
+  <body class="min-h-screen px-4 py-6 pb-10">
+    <div class="max-w-lg mx-auto space-y-4">
 
-        <div class="relative">
-          <div
-            class="w-28 h-28 mx-auto rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-4xl font-bold mb-4 border border-white/30 shadow-lg"
-          >
-            <span
-              th:text="${profile.name != null ? #strings.substring(profile.name,0,1) : '?'}"
-            ></span>
+      <!-- HERO CARD -->
+      <div class="hero-card rounded-3xl p-6 relative">
+        <div class="relative z-10 flex items-center gap-4">
+          <!-- Avatar -->
+          <div class="w-20 h-20 rounded-full avatar-ring bg-indigo-900 flex items-center justify-center text-3xl font-bold text-indigo-200 flex-shrink-0 overflow-hidden">
+            <span th:if="${profile.photoUrl == null}" th:text="${profile.name != null ? #strings.substring(profile.name,0,1).toUpperCase() : '?'}">D</span>
+            <img th:if="${profile.photoUrl != null}" th:src="${profile.photoUrl}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='?'" alt="foto" />
           </div>
-
-          <h1
-            class="text-3xl font-bold tracking-wide"
-            th:text="${profile.name}"
-          ></h1>
-
-          <p class="opacity-90 mt-1" th:text="${profile.email}"></p>
-
-          <p class="opacity-80 text-sm" th:text="${profile.phone}"></p>
-        </div>
-      </div>
-
-      <!-- INFO GRID -->
-      <div class="grid md:grid-cols-2 gap-6 mt-6">
-        <!-- PERSONAL CARD -->
-        <div
-          class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-lg"
-        >
-          <h2 class="text-indigo-400 font-semibold mb-4 text-lg">
-            🧍 Datos personales
-          </h2>
-
-          <div class="space-y-2 text-gray-300">
-            <p>
-              <span class="text-gray-500">Nacimiento:</span>
-              <span th:text="${profile.birthDate} ?: 'No registrado'"></span>
-            </p>
-
-            <p>
-              <span class="text-gray-500">Tipo de sangre:</span>
-
-              <span
-                class="bg-red-600 px-2 py-1 rounded text-sm font-semibold ml-2"
-                th:text="${profile.bloodType} ?: '--'"
-              >
-              </span>
-            </p>
-            <!-- direccion -->
-            <p>
-              <span class="text-gray-500">Dirección:</span>
-              <span th:text="${profile.address} ?: 'No registrado'"></span>
-            </p>
-          </div>
-        </div>
-
-        <!-- EMERGENCY CARD -->
-        <div
-          class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-lg"
-        >
-          <h2 class="text-indigo-400 font-semibold mb-4 text-lg">
-            🚨 Contacto emergencia
-          </h2>
-
-          <div class="space-y-2 text-gray-300">
-            <p th:text="${profile.emergencyContactName} ?: 'No registrado'"></p>
-
-            <p th:text="${profile.emergencyContactPhone} ?: '--'"></p>
-
-            <p
-              class="text-gray-500 text-sm"
-              th:text="${profile.emergencyContactRelation}"
-            ></p>
-          </div>
-        </div>
-
-        <!-- MEDICAL CARD -->
-        <div
-          class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-lg md:col-span-2"
-        >
-          <h2 class="text-indigo-400 font-semibold mb-4 text-lg">
-            🩺 Información médica
-          </h2>
-
-          <div class="space-y-3 text-gray-300">
-            <p>
-              <span class="text-gray-500">Alergias:</span>
-              <span
-                th:text="${profile.allergies} ?: 'Ninguna registrada'"
-              ></span>
-            </p>
-
-            <p>
-              <span class="text-gray-500">Enfermedades:</span>
-              <span
-                th:text="${profile.chronicDiseases} ?: 'Ninguna registrada'"
-              ></span>
-            </p>
-
-            <p>
-              <span class="text-gray-500">Medicamentos:</span>
-              <span
-                th:text="${profile.medications} ?: 'Ninguno registrado'"
-              ></span>
-            </p>
-          </div>
-        </div>
-
-        <!-- INSURANCE CARD -->
-        <div
-          class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-lg md:col-span-2"
-        >
-          <h2 class="text-indigo-400 font-semibold mb-4 text-lg">
-            🏥 Seguro médico
-          </h2>
-
-          <div class="space-y-2 text-gray-300">
-            <p th:text="${profile.insuranceProvider} ?: 'No registrado'"></p>
-
-            <p
-              class="text-gray-500 text-sm"
-              th:text="${profile.insuranceNumber}"
-            ></p>
+          <!-- Name & meta -->
+          <div class="flex-1 min-w-0">
+            <h1 class="text-white font-bold text-xl leading-tight truncate" th:text="${profile.name}">Daniela Torres</h1>
+            <p class="text-indigo-200 text-sm mt-0.5 truncate" th:text="${profile.email}">daniela@example.com</p>
+            <div class="flex items-center gap-2 mt-2 flex-wrap">
+              <span class="blood-badge mono text-white text-xs font-bold px-2.5 py-0.5 rounded-full" th:text="${profile.bloodType} ?: '--'">A+</span>
+              <span class="bg-white/10 text-indigo-100 text-xs px-2.5 py-0.5 rounded-full" th:text="${profile.insuranceProvider} ?: 'Sin seguro'">IMSS</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- EDIT ACCESS CARD -->
-      <div
-        class="mt-6 bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-lg"
-      >
-        <form
-          method="post"
-          th:action="@{/profile/{token}/verify(token=${profile.token})}"
-          class="space-y-3"
-        >
-          <input
-            name="password"
-            type="password"
-            placeholder="Contraseña para editar perfil"
-            class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
+      <!-- TABS -->
+      <div class="info-card rounded-2xl overflow-hidden">
+        <!-- Tab nav (scrollable horizontally) -->
+        <div class="flex overflow-x-auto border-b border-gray-800 px-2" id="tab-nav" style="scrollbar-width:none;">
+          <button class="tab-btn active px-4 py-3.5 text-sm font-semibold" onclick="switchTab('personal', this)">👤 Personal</button>
+          <button class="tab-btn px-4 py-3.5 text-sm font-semibold" onclick="switchTab('medico', this)">🩺 Médico</button>
+          <button class="tab-btn px-4 py-3.5 text-sm font-semibold" onclick="switchTab('seguro', this)">🏥 Seguro</button>
+          <button class="tab-btn px-4 py-3.5 text-sm font-semibold" onclick="switchTab('emergencia', this)">🚨 Emergencia</button>
+        </div>
 
-          <button
-            class="w-full bg-indigo-600 hover:bg-indigo-500 transition duration-200 py-3 rounded-lg font-semibold shadow-md"
-          >
-            Editar perfil
+        <!-- Tab: Personal -->
+        <div class="tab-panel active p-5 space-y-4" id="tab-personal">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="data-label">Teléfono</p>
+              <p class="data-value mt-1" th:text="${profile.phone} ?: '—'">555-0001</p>
+            </div>
+            <div>
+              <p class="data-label">Nacimiento</p>
+              <p class="data-value mt-1" th:text="${profile.birthDate} ?: '—'">1990-05-15</p>
+            </div>
+            <div class="col-span-2">
+              <p class="data-label">Dirección</p>
+              <p class="data-value mt-1" th:text="${profile.address} ?: '—'">Av. Reforma 123, CDMX</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Médico -->
+        <div class="tab-panel p-5 space-y-4" id="tab-medico">
+          <div>
+            <p class="data-label">Alergias</p>
+            <p class="data-value mt-1" th:text="${profile.allergies} ?: 'Ninguna registrada'">Penicilina</p>
+          </div>
+          <div>
+            <p class="data-label">Enfermedades crónicas</p>
+            <p class="data-value mt-1" th:text="${profile.chronicDiseases} ?: 'Ninguna registrada'">—</p>
+          </div>
+          <div>
+            <p class="data-label">Medicamentos actuales</p>
+            <p class="data-value mt-1" th:text="${profile.medications} ?: 'Ninguno registrado'">—</p>
+          </div>
+        </div>
+
+        <!-- Tab: Seguro -->
+        <div class="tab-panel p-5 space-y-4" id="tab-seguro">
+          <div>
+            <p class="data-label">Proveedor</p>
+            <p class="data-value mt-1" th:text="${profile.insuranceProvider} ?: 'No registrado'">IMSS</p>
+          </div>
+          <div>
+            <p class="data-label mono">Nº de póliza</p>
+            <p class="data-value mono mt-1 text-indigo-300" th:text="${profile.insuranceNumber} ?: '—'">POL-00123</p>
+          </div>
+        </div>
+
+        <!-- Tab: Emergencia -->
+        <div class="tab-panel p-5 space-y-4" id="tab-emergencia">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-2">
+              <p class="data-label">Nombre</p>
+              <p class="data-value mt-1" th:text="${profile.emergencyContactName} ?: 'No registrado'">Carlos Torres</p>
+            </div>
+            <div>
+              <p class="data-label">Teléfono</p>
+              <p class="data-value mt-1" th:text="${profile.emergencyContactPhone} ?: '—'">555-9999</p>
+            </div>
+            <div>
+              <p class="data-label">Relación</p>
+              <p class="data-value mt-1" th:text="${profile.emergencyContactRelation} ?: '—'">Hermano</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EDIT ACCESS -->
+      <div class="info-card rounded-2xl p-5">
+        <p class="data-label mb-3">Acceder para editar</p>
+        <form method="post" th:action="@{/profile/{token}/verify(token=${profile.token})}" class="space-y-3">
+          <input name="password" type="password" placeholder="Contraseña"
+            class="edit-input w-full px-4 py-3 rounded-xl text-sm" />
+          <button type="submit" class="btn-primary w-full py-3 rounded-xl font-semibold text-white text-sm">
+            Editar perfil →
           </button>
         </form>
       </div>
+
     </div>
+
+    <script>
+      function switchTab(name, btn) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        btn.classList.add('active');
+      }
+    </script>
   </body>
 </html>

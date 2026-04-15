@@ -1,0 +1,37 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Página no encontrada</title>
+
+    <link rel="stylesheet" th:href="@{/css/output.css}" />
+  </head>
+
+  <body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
+    <div class="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
+      <h1 class="text-5xl font-bold text-red-500 mb-4">404</h1>
+
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">
+        Página no encontrada
+      </h2>
+
+      <p class="text-gray-600 mb-6">
+        El recurso que estás buscando no existe o fue eliminado.
+      </p>
+
+      <div th:if="${token}" class="mb-6">
+        <p class="text-sm text-gray-500">Token solicitado:</p>
+
+        <p
+          class="font-mono text-gray-800 bg-gray-100 rounded-lg px-3 py-2 mt-1"
+          th:text="${token}"
+        ></p>
+      </div>
+
+      <!-- <a th:href="@{/}"
+         class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl transition">
+        Volver al inicio
+      </a> -->
+    </div>
+  </body>
+</html>

@@ -2,284 +2,449 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
-    <title>Perfil médico</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crear perfil médico</title>
     <link rel="stylesheet" th:href="@{/css/output.css}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        font-family: "DM Sans", sans-serif;
+      }
+      .mono {
+        font-family: "DM Mono", monospace;
+      }
+
+      body {
+        background: #0a0f1e;
+        background-image:
+          radial-gradient(
+            ellipse 60% 40% at 50% -10%,
+            rgba(99, 102, 241, 0.18) 0%,
+            transparent 70%
+          ),
+          radial-gradient(
+            ellipse 40% 30% at 90% 80%,
+            rgba(168, 85, 247, 0.1) 0%,
+            transparent 60%
+          );
+      }
+
+      /* Form card */
+      .form-card {
+        background: rgba(17, 24, 39, 0.85);
+        border: 1px solid rgba(55, 65, 81, 0.6);
+        backdrop-filter: blur(8px);
+      }
+
+      /* Section header */
+      .section-label {
+        color: #818cf8;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+      }
+
+      /* Inputs */
+      .field-input,
+      .field-textarea {
+        background: rgba(31, 41, 55, 0.7);
+        border: 1px solid rgba(75, 85, 99, 0.5);
+        color: #f3f4f6;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+        width: 100%;
+        border-radius: 0.75rem;
+        padding: 0.65rem 1rem;
+        font-size: 0.9rem;
+        font-family: "DM Sans", sans-serif;
+      }
+      .field-input:focus,
+      .field-textarea:focus {
+        outline: none;
+        border-color: #818cf8;
+        box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.12);
+      }
+      .field-input::placeholder,
+      .field-textarea::placeholder {
+        color: #4b5563;
+      }
+      .field-input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(0.5);
+      }
+
+      .field-label {
+        display: block;
+        color: #9ca3af;
+        font-size: 0.78rem;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+        letter-spacing: 0.01em;
+      }
+
+      /* Section divider */
+      .section-block {
+        border-top: 1px solid rgba(55, 65, 81, 0.5);
+        padding-top: 1.25rem;
+        margin-top: 1.25rem;
+      }
+      .section-block:first-child {
+        border-top: none;
+        padding-top: 0;
+        margin-top: 0;
+      }
+
+      /* Buttons */
+      .btn-primary {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        transition:
+          opacity 0.2s,
+          transform 0.15s;
+        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+        color: white;
+        font-weight: 600;
+        border-radius: 0.875rem;
+        padding: 0.8rem 1.5rem;
+        font-size: 0.92rem;
+        cursor: pointer;
+        border: none;
+      }
+      .btn-primary:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+      .btn-primary:active {
+        transform: translateY(0);
+      }
+
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #9ca3af;
+        font-weight: 500;
+        border-radius: 0.875rem;
+        padding: 0.8rem 1.5rem;
+        font-size: 0.92rem;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      /* Top header bar */
+      .top-bar {
+        background: linear-gradient(
+          135deg,
+          #312e81 0%,
+          #4c1d95 50%,
+          #1e1b4b 100%
+        );
+        position: relative;
+        overflow: hidden;
+      }
+      .top-bar::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+    </style>
   </head>
 
-  <body class="bg-gray-100 min-h-screen py-10 px-4">
-    <div class="max-w-3xl mx-auto">
-      <div
-        class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200"
-      >
-        <!-- Header con foto y nombre -->
-        <div
-          class="bg-gray-50 border-b border-gray-200 px-6 py-5 flex items-center gap-4"
+  <body class="min-h-screen pb-10">
+    <div class="max-w-lg mx-auto">
+      <!-- Top bar -->
+      <div class="top-bar px-5 pt-8 pb-6 relative z-10">
+        <p
+          class="text-indigo-300 text-xs font-semibold uppercase tracking-widest mb-1"
         >
-          <div
-            class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-semibold text-lg overflow-hidden flex-shrink-0"
-          >
-            <img
-              th:src="${photoUrl}"
-              src="https://i.pravatar.cc/300?img=32"
-              alt="Foto de perfil"
-              class="w-full h-full object-cover"
-              onerror="this.style.display = 'none'"
-            />
-          </div>
-          <div>
-            <p class="text-gray-900 font-semibold text-base leading-tight">
-              <span th:text="${name}">Daniela Torres Méndez</span>
-              <span
-                class="ml-2 inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-0.5 rounded-full"
-                th:text="${bloodType}"
-                >A-</span
-              >
-            </p>
-            <p class="text-gray-500 text-sm mt-0.5">
-              Paciente activa ·
-              <span th:text="${insuranceProvider}">Seguro Popular</span>
-            </p>
-          </div>
-        </div>
-
+          Nuevo registro
+        </p>
+        <h1 class="text-white text-2xl font-bold">Perfil médico</h1>
+        <p class="text-indigo-200/70 text-sm mt-1">
+          Completa tu información de salud
+        </p>
+      </div>
+      <!-- Form card -->
+      <div class="form-card mx-4 -mt-2 rounded-2xl p-5">
         <form method="post" th:action="@{/profile/{token}(token=${token})}">
-          <!-- Datos personales -->
-          <div class="px-6 py-5 border-b border-gray-200">
-            <p
-              class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4"
-            >
-              Datos personales
-            </p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Personal -->
+          <div class="section-block">
+            <p class="section-label mb-4">👤 Datos personales</p>
+            <div class="space-y-3">
               <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1"
-                  >Nombre completo</label
-                >
+                <label class="field-label">Nombre completo</label>
                 <input
                   name="name"
                   th:value="${name}"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  placeholder="Ej. Daniela Torres Méndez"
+                  class="field-input"
                 />
               </div>
-
-              <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1"
-                  >Fecha de nacimiento</label
-                >
-                <input
-                  type="date"
-                  name="birthDate"
-                  th:value="${birthDate}"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="field-label">Fecha de nacimiento</label>
+                  <input
+                    type="date"
+                    name="birthDate"
+                    th:value="${birthDate}"
+                    class="field-input"
+                  />
+                </div>
+                <div>
+                  <label class="field-label">Teléfono</label>
+                  <input
+                    name="phone"
+                    th:value="${phone}"
+                    placeholder="55 1234 5678"
+                    class="field-input"
+                  />
+                </div>
               </div>
-
               <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1"
-                  >Teléfono</label
-                >
-                <input
-                  name="phone"
-                  th:value="${phone}"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-              </div>
-
-              <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1"
-                  >Correo electrónico</label
-                >
+                <label class="field-label">Correo electrónico</label>
                 <input
                   type="email"
                   name="email"
                   th:value="${email}"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  placeholder="correo@ejemplo.com"
+                  class="field-input"
                 />
               </div>
-
-              <div class="md:col-span-2">
-                <label class="block text-xs font-medium text-gray-500 mb-1"
-                  >Dirección</label
-                >
+              <div>
+                <label class="field-label">Dirección</label>
                 <input
                   name="address"
                   th:value="${address}"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  placeholder="Calle, número, colonia"
+                  class="field-input"
                 />
               </div>
             </div>
           </div>
 
-          <!-- Información médica -->
-          <div class="px-6 py-5 border-b border-gray-200">
-            <p
-              class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4"
-            >
-              Información médica
-            </p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Médico -->
+          <div class="section-block">
+            <p class="section-label mb-4">🩺 Información médica</p>
+            <div class="space-y-3">
               <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1"
-                  >Tipo de sangre</label
-                >
+                <label class="field-label">Tipo de sangre</label>
                 <input
                   name="bloodType"
                   th:value="${bloodType}"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  placeholder="Ej. A+"
+                  class="field-input"
                 />
               </div>
-
-              <div class="md:col-span-2">
-                <label class="block text-xs font-medium text-gray-500 mb-1"
-                  >Alergias</label
-                >
+              <div>
+                <label class="field-label">Alergias</label>
                 <textarea
                   name="allergies"
                   th:text="${allergies}"
                   rows="2"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                  placeholder="Penicilina, látex..."
+                  class="field-textarea resize-none"
                 ></textarea>
               </div>
-
-              <div class="md:col-span-2">
-                <label class="block text-xs font-medium text-gray-500 mb-1"
-                  >Enfermedades crónicas</label
-                >
+              <div>
+                <label class="field-label">Enfermedades crónicas</label>
                 <textarea
                   name="chronicDiseases"
                   th:text="${chronicDiseases}"
                   rows="2"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                  placeholder="Diabetes, hipertensión..."
+                  class="field-textarea resize-none"
                 ></textarea>
               </div>
-
-              <div class="md:col-span-2">
-                <label class="block text-xs font-medium text-gray-500 mb-1"
-                  >Medicamentos actuales</label
-                >
+              <div>
+                <label class="field-label">Medicamentos actuales</label>
                 <textarea
                   name="medications"
                   th:text="${medications}"
                   rows="2"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                  placeholder="Metformina 500mg..."
+                  class="field-textarea resize-none"
                 ></textarea>
               </div>
             </div>
           </div>
 
-          <!-- Seguro médico -->
-          <div class="px-6 py-5 border-b border-gray-200">
-            <p
-              class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4"
-            >
-              Seguro médico
-            </p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Seguro -->
+          <div class="section-block">
+            <p class="section-label mb-4">🏥 Seguro médico</p>
+            <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1"
-                  >Proveedor</label
-                >
+                <label class="field-label">Proveedor</label>
                 <input
                   name="insuranceProvider"
                   th:value="${insuranceProvider}"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  placeholder="IMSS, ISSSTE..."
+                  class="field-input"
                 />
               </div>
-
               <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1"
-                  >Número de póliza</label
-                >
+                <label class="field-label mono">Nº de póliza</label>
                 <input
                   name="insuranceNumber"
                   th:value="${insuranceNumber}"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  placeholder="POL-00123"
+                  class="field-input mono"
                 />
               </div>
             </div>
           </div>
 
-          <!-- Contacto de emergencia -->
-          <div class="px-6 py-5 border-b border-gray-200">
-            <p
-              class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4"
-            >
-              Contacto de emergencia
-            </p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Emergencia -->
+          <div class="section-block">
+            <p class="section-label mb-4">🚨 Contacto de emergencia</p>
+            <div class="space-y-3">
               <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1"
-                  >Nombre</label
-                >
+                <label class="field-label">Nombre</label>
                 <input
                   name="emergencyContactName"
                   th:value="${emergencyContactName}"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  placeholder="Nombre completo"
+                  class="field-input"
                 />
               </div>
-
-              <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1"
-                  >Teléfono</label
-                >
-                <input
-                  name="emergencyContactPhone"
-                  th:value="${emergencyContactPhone}"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-              </div>
-
-              <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1"
-                  >Relación</label
-                >
-                <input
-                  name="emergencyContactRelation"
-                  th:value="${emergencyContactRelation}"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="field-label">Teléfono</label>
+                  <input
+                    name="emergencyContactPhone"
+                    th:value="${emergencyContactPhone}"
+                    placeholder="55 0000 0000"
+                    class="field-input"
+                  />
+                </div>
+                <div>
+                  <label class="field-label">Relación</label>
+                  <input
+                    name="emergencyContactRelation"
+                    th:value="${emergencyContactRelation}"
+                    placeholder="Madre, esposo..."
+                    class="field-input"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Seguridad -->
-          <div class="px-6 py-5 border-b border-gray-200">
-            <p
-              class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4"
-            >
-              Seguridad
-            </p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="section-block">
+            <p class="section-label mb-4">🔒 Seguridad</p>
+            <div class="space-y-3">
               <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1"
-                  >Contraseña</label
-                >
+                <label class="field-label">Contraseña de acceso</label>
                 <input
                   type="password"
                   name="password"
-                  class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  placeholder="Crea una contraseña"
+                  class="field-input"
+                  required
+                />
+              </div>
+
+              <div>
+                <label class="field-label">Confirmar contraseña</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="Repite la contraseña"
+                  class="field-input"
+                  required
                 />
               </div>
             </div>
           </div>
 
-          <!-- Acciones -->
-          <div class="px-6 py-4 flex justify-end gap-3 bg-gray-50">
-            <button
-              type="button"
-              class="px-5 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              class="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-sm"
-            >
+          <!-- Actions -->
+          <div class="flex gap-3 mt-6">
+            <button type="button" class="btn-ghost flex-1">Cancelar</button>
+            <button type="submit" class="btn-primary flex-1">
               Guardar perfil
             </button>
           </div>
         </form>
       </div>
     </div>
+    <!-- Toast de error -->
+    <div
+      th:if="${error}"
+      id="toast-error"
+      class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-2xl"
+      style="
+        background: rgba(239, 68, 68, 0.12);
+        border: 1px solid rgba(239, 68, 68, 0.35);
+        backdrop-filter: blur(12px);
+        min-width: 280px;
+        max-width: 90vw;
+        animation: slideUp 0.35s cubic-bezier(0.21, 1.02, 0.73, 1) both;
+      "
+    >
+      <span style="font-size: 1.2rem">⚠️</span>
+      <span
+        style="color: #fca5a5; font-size: 0.875rem; font-weight: 600"
+        th:text="${error}"
+      ></span>
+      <button
+        onclick="dismissToast()"
+        style="
+          margin-left: auto;
+          color: #f87171;
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-size: 1rem;
+          line-height: 1;
+        "
+      >
+        ✕
+      </button>
+    </div>
+
+    <style>
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translate(-50%, 20px);
+        }
+        to {
+          opacity: 1;
+          transform: translate(-50%, 0);
+        }
+      }
+      @keyframes slideDown {
+        from {
+          opacity: 1;
+          transform: translate(-50%, 0);
+        }
+        to {
+          opacity: 0;
+          transform: translate(-50%, 20px);
+        }
+      }
+    </style>
+
+    <script th:if="${error}">
+      // Auto-dismiss después de 4 segundos
+      setTimeout(() => dismissToast(), 4000);
+
+      function dismissToast() {
+        const t = document.getElementById("toast-error");
+        if (!t) return;
+        t.style.animation = "slideDown 0.3s ease forwards";
+        setTimeout(() => t.remove(), 300);
+      }
+
+      // Focus automático al campo de contraseña
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelector('[name="password"]').focus();
+      });
+    </script>
   </body>
 </html>

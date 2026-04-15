@@ -1,4 +1,4 @@
-package com.example.profilesystem.entity;
+package com.example.profilesystem.profile.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
