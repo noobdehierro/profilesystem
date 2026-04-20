@@ -2,8 +2,10 @@ FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
 
-COPY target/profilesystem-0.0.1-SNAPSHOT.jar app.jar
+COPY . .
+
+RUN ./mvnw clean package -DskipTests
 
 EXPOSE 8080
 
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+ENTRYPOINT ["java","-jar","target/profilesystem-0.0.1-SNAPSHOT.jar"]
