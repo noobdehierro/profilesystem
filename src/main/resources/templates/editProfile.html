@@ -184,8 +184,40 @@
       <div class="form-card mx-4 -mt-2 rounded-2xl p-5">
         <form
           method="post"
+          enctype="multipart/form-data"
           th:action="@{/profile/{token}/update(token=${profile.token})}"
         >
+          <!-- AVATAR -->
+          <div class="flex justify-center mb-4">
+            <label class="cursor-pointer relative group">
+              <div
+                class="w-20 h-20 rounded-full border-2 border-dashed border-indigo-400/60 flex items-center justify-center overflow-hidden bg-white/5"
+              >
+                <img
+                  id="preview"
+                  th:if="${profile.photoUrl != null}"
+                  th:src="@{${profile.photoUrl}}"
+                  class="w-full h-full object-cover rounded-full"
+                />
+
+                <span
+                  th:if="${profile.photoUrl == null}"
+                  id="placeholder"
+                  class="text-xs text-indigo-200/70"
+                >
+                  Subir<br />imagen
+                </span>
+              </div>
+
+              <input
+                type="file"
+                name="photo"
+                accept="image/png,image/jpeg,image/webp"
+                class="hidden"
+                onchange="previewImage(event)"
+              />
+            </label>
+          </div>
           <!-- Personal -->
           <div class="section-block">
             <p class="section-label mb-4">👤 Datos personales</p>
@@ -453,6 +485,29 @@
       document.addEventListener("DOMContentLoaded", () => {
         document.querySelector('[name="password"]').focus();
       });
+    </script>
+    <script>
+      function previewImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          let img = document.getElementById("preview");
+
+          if (!img) {
+            img = document.createElement("img");
+            img.id = "preview";
+            img.className = "w-full h-full object-cover rounded-full";
+            event.target.closest("label").querySelector("div").appendChild(img);
+          }
+
+          img.src = e.target.result;
+        };
+
+        reader.readAsDataURL(file);
+      }
     </script>
   </body>
 </html>

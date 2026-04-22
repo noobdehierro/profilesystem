@@ -1,5 +1,10 @@
 package com.example.profilesystem.profile.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -11,22 +16,28 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.profilesystem.profile.entity.Profile;
 import com.example.profilesystem.profile.service.ProfileService;
+import com.example.profilesystem.qr.entity.QRCode;
+import com.example.profilesystem.qr.repository.QRCodeRepository;
 import com.example.profilesystem.qr.service.BulkQRService;
 
 @Controller
 @RequestMapping("/profile")
 public class ProfileController {
-    private final ProfileService service;
+    private final ProfileService profileService;
     private final BulkQRService bulkQRService;
     private final BCryptPasswordEncoder encoder;
+    private final QRCodeRepository qrRepository;
 
-    public ProfileController(ProfileService service, BulkQRService bulkQRService, BCryptPasswordEncoder encoder) {
-        this.service = service;
+    public ProfileController(ProfileService profileService, BulkQRService bulkQRService, BCryptPasswordEncoder encoder,
+            QRCodeRepository qrRepository) {
+        this.profileService = profileService;
         this.bulkQRService = bulkQRService;
         this.encoder = encoder;
+        this.qrRepository = qrRepository;
     }
 
     @GetMapping("/{token}")
@@ -39,7 +50,7 @@ public class ProfileController {
             return "qrNotFound";
         }
 
-        Optional<Profile> profile = service.findByToken(token);
+        Optional<Profile> profile = profileService.findByToken(token);
 
         if (profile.isEmpty()) {
 
@@ -57,6 +68,7 @@ public class ProfileController {
             @PathVariable String token,
             @ModelAttribute Profile profile,
             @RequestParam String confirmPassword,
+            @RequestParam("photo") MultipartFile photo,
             Model model) {
 
         if (!profile.getPassword().equals(confirmPassword)) {
@@ -81,9 +93,37 @@ public class ProfileController {
 
             return "createProfile";
         }
+        String folderPath = System.getProperty("user.dir") + "/uploads/profiles/";
+
+        File directory = new File(folderPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        if (photo.isEmpty()) {
+            throw new RuntimeException("No se recibió archivo");
+        }
+
+        String filename = token + "_" + photo.getOriginalFilename();
+
+        File destination = new File(folderPath + filename);
+
+        try {
+            photo.transferTo(destination);
+        } catch (IOException e) {
+            throw new RuntimeException("Error guardando imagen", e);
+        }
+
+        profile.setPhotoUrl("/uploads/profiles/" + filename);
 
         profile.setToken(token);
-        service.create(profile);
+        profileService.create(profile);
+        QRCode qr = qrRepository.findById(token).orElse(null);
+
+        if (qr != null) {
+            qr.setUsed(true);
+            qrRepository.save(qr);
+        }
         return "redirect:/profile/" + token;
     }
 
@@ -92,11 +132,11 @@ public class ProfileController {
             @RequestParam String password,
             Model model) {
 
-        Profile profile = service
+        Profile profile = profileService
                 .findByToken(token)
                 .orElseThrow();
 
-        boolean valid = service.checkPassword(
+        boolean valid = profileService.checkPassword(
                 password,
                 profile.getPassword());
 
@@ -120,13 +160,14 @@ public class ProfileController {
             @RequestParam(required = false) String newPassword,
             @RequestParam(required = false) String confirmNewPassword,
             @ModelAttribute Profile profileData,
+            @RequestParam("photo") MultipartFile photo,
             Model model) {
 
-        Profile existingProfile = service
+        Profile existingProfile = profileService
                 .findByToken(token)
                 .orElseThrow();
 
-        if (!service.checkPassword(password, existingProfile.getPassword())) {
+        if (!profileService.checkPassword(password, existingProfile.getPassword())) {
             // Conserva lo que el usuario escribió, no lo de la BD
             profileData.setToken(token);
             profileData.setPassword(existingProfile.getPassword()); // no exponer el hash
@@ -160,7 +201,43 @@ public class ProfileController {
         existingProfile.setEmergencyContactPhone(profileData.getEmergencyContactPhone());
         existingProfile.setEmergencyContactRelation(profileData.getEmergencyContactRelation());
 
-        service.update(existingProfile);
+        if (!photo.isEmpty()) {
+
+            if (existingProfile.getPhotoUrl() != null) {
+
+                Path oldImage = Paths.get(
+                        System.getProperty("user.dir") +
+                                existingProfile.getPhotoUrl());
+
+                try {
+                    Files.deleteIfExists(oldImage);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            String folderPath = System.getProperty("user.dir") + "/uploads/profiles/";
+
+            File directory = new File(folderPath);
+
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            String filename = token + "_" + photo.getOriginalFilename();
+
+            File destination = new File(folderPath + filename);
+
+            try {
+                photo.transferTo(destination);
+            } catch (IllegalStateException | IOException e) {
+                e.printStackTrace();
+            }
+
+            existingProfile.setPhotoUrl("/uploads/profiles/" + filename);
+        }
+
+        profileService.update(existingProfile);
         return "redirect:/profile/" + token;
     }
 }

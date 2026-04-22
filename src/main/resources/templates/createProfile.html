@@ -172,8 +172,35 @@
       </div>
       <!-- Form card -->
       <div class="form-card mx-4 -mt-2 rounded-2xl p-5">
-        <form method="post" th:action="@{/profile/{token}(token=${token})}">
-          <!-- Personal -->
+        <form
+          method="post"
+          enctype="multipart/form-data"
+          th:action="@{/profile/{token}(token=${token})}"
+        >
+          <!-- AVATAR -->
+          <div class="flex justify-center mb-4">
+            <label class="cursor-pointer relative group">
+              <div
+                class="w-20 h-20 rounded-full border-2 border-dashed border-indigo-400/60 flex items-center justify-center overflow-hidden bg-white/5"
+              >
+                <img
+                  id="preview"
+                  class="hidden w-full h-full object-cover rounded-full"
+                />
+                <span id="placeholder" class="text-xs text-indigo-200/70">
+                  Subir<br />imagen
+                </span>
+              </div>
+
+              <input
+                type="file"
+                name="photo"
+                accept="image/png,image/jpeg,image/webp"
+                class="hidden"
+                onchange="previewImage(event)"
+              />
+            </label>
+          </div>
           <div class="section-block">
             <p class="section-label mb-4">👤 Datos personales</p>
             <div class="space-y-3">
@@ -445,6 +472,25 @@
       document.addEventListener("DOMContentLoaded", () => {
         document.querySelector('[name="password"]').focus();
       });
+    </script>
+    <script>
+      function previewImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          const img = document.getElementById("preview");
+          const placeholder = document.getElementById("placeholder");
+
+          img.src = e.target.result;
+          img.classList.remove("hidden");
+          placeholder.style.display = "none";
+        };
+
+        reader.readAsDataURL(file);
+      }
     </script>
   </body>
 </html>

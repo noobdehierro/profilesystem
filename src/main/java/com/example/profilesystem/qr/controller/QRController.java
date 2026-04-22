@@ -22,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.profilesystem.profile.service.ProfileService;
 import com.example.profilesystem.qr.entity.QRCode;
 import com.example.profilesystem.qr.repository.QRCodeRepository;
 import com.example.profilesystem.qr.service.BulkQRService;
@@ -35,10 +36,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class QRController {
     private final BulkQRService bulkQRService;
     private final QRCodeRepository qrRepository;
+    private final ProfileService profileService;
 
-    public QRController(QRCodeRepository qrRepository, BulkQRService bulkQRService) {
+    public QRController(QRCodeRepository qrRepository, BulkQRService bulkQRService, ProfileService profileService) {
         this.bulkQRService = bulkQRService;
         this.qrRepository = qrRepository;
+        this.profileService = profileService;
     }
 
     @GetMapping
@@ -56,12 +59,17 @@ public class QRController {
 
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable String id) {
+
+        profileService.deleteByToken(id); // 🔥 borra perfil + imagen
+
         qrRepository.deleteById(id);
+
         try {
             Files.deleteIfExists(Paths.get("qrs/qr-" + id + ".png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return "redirect:/admin/qrs";
     }
 

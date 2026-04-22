@@ -1,5 +1,9 @@
 package com.example.profilesystem.profile.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -48,5 +52,28 @@ public class ProfileService {
     public String encodePassword(String password) {
 
         return encoder.encode(password);
+    }
+
+    public void deleteByToken(String token) {
+
+        Optional<Profile> profile = repository.findByToken(token);
+
+        if (profile.isPresent()) {
+
+            if (profile.get().getPhotoUrl() != null) {
+
+                Path imagePath = Paths.get(
+                        System.getProperty("user.dir") +
+                                profile.get().getPhotoUrl());
+
+                try {
+                    Files.deleteIfExists(imagePath);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            repository.delete(profile.get());
+        }
     }
 }
