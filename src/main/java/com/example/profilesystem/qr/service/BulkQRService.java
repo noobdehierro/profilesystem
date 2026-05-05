@@ -48,8 +48,7 @@ public class BulkQRService {
         }
     }
 
-    public void updateScanCount(String id) {
-        QRCode qrCode = qrCodeRepository.findById(id).orElseThrow();
+    public void updateScanCount(QRCode qrCode) {
         qrCode.setScanCount(qrCode.getScanCount() + 1);
         qrCode.setLastScanAt(LocalDateTime.now());
 
@@ -58,25 +57,21 @@ public class BulkQRService {
 
     public boolean validateAndRegisterScan(String token) {
 
-    Optional<QRCode> qrOptional = qrCodeRepository.findById(token);
+        Optional<QRCode> qrOptional = qrCodeRepository.findById(token);
 
-    if (qrOptional.isEmpty()) {
-        return false;
+        if (qrOptional.isEmpty()) {
+            return false;
+        }
+
+        QRCode qr = qrOptional.get();
+
+        if (qr.getExpiresAt() != null &&
+                qr.getExpiresAt().isBefore(LocalDateTime.now())) {
+            return false;
+        }
+
+        updateScanCount(qr);
+
+        return true;
     }
-
-    QRCode qr = qrOptional.get();
-
-    if (qr.getExpiresAt() != null &&
-        qr.getExpiresAt().isBefore(LocalDateTime.now())) {
-
-        return false;
-    }
-
-    qr.setScanCount(qr.getScanCount() + 1);
-    qr.setLastScanAt(LocalDateTime.now());
-
-    qrCodeRepository.save(qr);
-
-    return true;
-}
 }

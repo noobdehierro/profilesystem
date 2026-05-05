@@ -40,7 +40,7 @@ public class SecurityConfig implements WebMvcConfigurer {
     public InMemoryUserDetailsManager userDetailsService() {
 
         UserDetails user = User.withUsername("admin")
-                .password(passwordEncoder().encode("1234"))//PepeChuy1234
+                .password(passwordEncoder().encode("123"))// PepeChuy1234
                 .roles("ADMIN")
                 .build();
 

@@ -1,60 +1,53 @@
 package com.example.profilesystem.profile.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.profilesystem.profile.entity.Profile;
+import com.example.profilesystem.profile.entity.ProfileForm;
+import com.example.profilesystem.profile.entity.ProfileFormEdit;
 import com.example.profilesystem.profile.service.ProfileService;
-import com.example.profilesystem.qr.entity.QRCode;
-import com.example.profilesystem.qr.repository.QRCodeRepository;
 import com.example.profilesystem.qr.service.BulkQRService;
+
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/profile")
 public class ProfileController {
     private final ProfileService profileService;
     private final BulkQRService bulkQRService;
-    private final BCryptPasswordEncoder encoder;
-    private final QRCodeRepository qrRepository;
 
-    public ProfileController(ProfileService profileService, BulkQRService bulkQRService, BCryptPasswordEncoder encoder,
-            QRCodeRepository qrRepository) {
+    public ProfileController(ProfileService profileService, BulkQRService bulkQRService) {
         this.profileService = profileService;
         this.bulkQRService = bulkQRService;
-        this.encoder = encoder;
-        this.qrRepository = qrRepository;
+        ;
     }
 
-    @GetMapping("/{token}")
-    public String showProfile(@PathVariable String token, Model model) {
+    @GetMapping("/{token_id}")
+    public String showProfile(@PathVariable String token_id, Model model) {
 
-        boolean exists = bulkQRService.validateAndRegisterScan(token);
+        boolean exists = bulkQRService.validateAndRegisterScan(token_id);
 
         if (!exists) {
-            model.addAttribute("token", token);
+            model.addAttribute("token_id", token_id);
             return "qrNotFound";
         }
 
-        Optional<Profile> profile = profileService.findByToken(token);
+        Optional<Profile> profile = profileService.findByToken(token_id);
 
         if (profile.isEmpty()) {
 
-            model.addAttribute("token", token);
+            model.addAttribute("token_id", token_id);
+            model.addAttribute("profile", new ProfileForm());
             return "createProfile";
         }
 
@@ -63,68 +56,35 @@ public class ProfileController {
         return "showProfile";
     }
 
-    @PostMapping("/{token}")
+    @PostMapping("/{token_id}")
     public String createProfile(
-            @PathVariable String token,
-            @ModelAttribute Profile profile,
-            @RequestParam String confirmPassword,
-            @RequestParam("photo") MultipartFile photo,
+            @PathVariable String token_id,
+            @Valid @ModelAttribute("profile") ProfileForm profileForm,
+            BindingResult bindingResult,
             Model model) {
 
-        if (!profile.getPassword().equals(confirmPassword)) {
-            model.addAttribute("token", token);
-            model.addAttribute("error", "Las contraseñas no coinciden");
+        if (profileForm.getPhoto() == null || profileForm.getPhoto().isEmpty()) {
+            bindingResult.rejectValue(
+                    "photo",
+                    "photo.empty",
+                    "La imagen es obligatoria");
+        }
 
-            // Mapea cada campo individualmente para que el HTML los lea
-            model.addAttribute("name", profile.getName());
-            model.addAttribute("birthDate", profile.getBirthDate());
-            model.addAttribute("phone", profile.getPhone());
-            model.addAttribute("email", profile.getEmail());
-            model.addAttribute("address", profile.getAddress());
-            model.addAttribute("bloodType", profile.getBloodType());
-            model.addAttribute("allergies", profile.getAllergies());
-            model.addAttribute("chronicDiseases", profile.getChronicDiseases());
-            model.addAttribute("medications", profile.getMedications());
-            model.addAttribute("insuranceProvider", profile.getInsuranceProvider());
-            model.addAttribute("insuranceNumber", profile.getInsuranceNumber());
-            model.addAttribute("emergencyContactName", profile.getEmergencyContactName());
-            model.addAttribute("emergencyContactPhone", profile.getEmergencyContactPhone());
-            model.addAttribute("emergencyContactRelation", profile.getEmergencyContactRelation());
-
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("token_id", token_id);
             return "createProfile";
         }
-        String folderPath = System.getProperty("user.dir") + "/uploads/profiles/";
 
-        File directory = new File(folderPath);
-        if (!directory.exists()) {
-            directory.mkdirs();
+        if (!profileForm.passwordMatch()) {
+            bindingResult.rejectValue(
+                    "confirmPassword",
+                    "password.mismatch",
+                    "Las contraseñas no coinciden");
+            return "createProfile";
         }
 
-        if (photo.isEmpty()) {
-            throw new RuntimeException("No se recibió archivo");
-        }
-
-        String filename = token + "_" + photo.getOriginalFilename();
-
-        File destination = new File(folderPath + filename);
-
-        try {
-            photo.transferTo(destination);
-        } catch (IOException e) {
-            throw new RuntimeException("Error guardando imagen", e);
-        }
-
-        profile.setPhotoUrl("/uploads/profiles/" + filename);
-
-        profile.setToken(token);
-        profileService.create(profile);
-        QRCode qr = qrRepository.findById(token).orElse(null);
-
-        if (qr != null) {
-            qr.setUsed(true);
-            qrRepository.save(qr);
-        }
-        return "redirect:/profile/" + token;
+        profileService.createProfile(token_id, profileForm);
+        return "redirect:/profile/" + token_id;
     }
 
     @PostMapping("/{token}/verify")
@@ -141,103 +101,80 @@ public class ProfileController {
                 profile.getPassword());
 
         if (!valid) {
-
             model.addAttribute("profile", profile);
+
             model.addAttribute("error", "Password incorrecto");
 
             return "showProfile";
+
         }
 
-        model.addAttribute("profile", profile);
+        ProfileFormEdit formEdit = new ProfileFormEdit();
+        formEdit.setToken(profile.getToken());
+        formEdit.setName(profile.getName());
+        formEdit.setBirthDate(profile.getBirthDate());
+        formEdit.setPhone(profile.getPhone());
+        formEdit.setEmail(profile.getEmail());
+        formEdit.setAddress(profile.getAddress());
+        formEdit.setBloodType(profile.getBloodType());
+        formEdit.setAllergies(profile.getAllergies());
+        formEdit.setChronicDiseases(profile.getChronicDiseases());
+        formEdit.setMedications(profile.getMedications());
+        formEdit.setInsuranceProvider(profile.getInsuranceProvider());
+        formEdit.setInsuranceNumber(profile.getInsuranceNumber());
+        formEdit.setEmergencyContactName(profile.getEmergencyContactName());
+        formEdit.setEmergencyContactPhone(profile.getEmergencyContactPhone());
+        formEdit.setEmergencyContactRelation(profile.getEmergencyContactRelation());
+
+        model.addAttribute("profile", formEdit);
+        model.addAttribute("photoUrl", profile.getPhotoUrl());
 
         return "editProfile";
     }
 
-    @PostMapping("/{token}/update")
-    public String updateProfile(
-            @PathVariable String token,
-            @RequestParam String password,
-            @RequestParam(required = false) String newPassword,
-            @RequestParam(required = false) String confirmNewPassword,
-            @ModelAttribute Profile profileData,
-            @RequestParam("photo") MultipartFile photo,
+    @PostMapping("/{token_id}/update")
+    public String updateProfile(@PathVariable String token_id,
+            @Valid @ModelAttribute("profile") ProfileFormEdit profileFormEdit,
+            BindingResult bindingResult,
             Model model) {
 
-        Profile existingProfile = profileService
-                .findByToken(token)
-                .orElseThrow();
-
-        if (!profileService.checkPassword(password, existingProfile.getPassword())) {
-            // Conserva lo que el usuario escribió, no lo de la BD
-            profileData.setToken(token);
-            profileData.setPassword(existingProfile.getPassword()); // no exponer el hash
-            model.addAttribute("profile", profileData);
-            model.addAttribute("error", "Contraseña actual incorrecta");
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("profile", profileFormEdit);
             return "editProfile";
         }
 
-        if (newPassword != null && !newPassword.isBlank()) {
-            if (!newPassword.equals(confirmNewPassword)) {
-                profileData.setToken(token);
-                profileData.setPassword(existingProfile.getPassword());
-                model.addAttribute("profile", profileData);
-                model.addAttribute("error", "Las nuevas contraseñas no coinciden");
+        if (profileFormEdit.getPhoto() == null || profileFormEdit.getPhoto().isEmpty()) {
+            bindingResult.rejectValue(
+                    "photo",
+                    "photo.empty",
+                    "La imagen es obligatoria");
+        }
+        if (profileFormEdit.getNewPassword() != null && !profileFormEdit.getNewPassword().isBlank()) {
+            if (!profileFormEdit.passwordMatch()) {
+                bindingResult.rejectValue(
+                        "confirmPassword",
+                        "password.mismatch",
+                        "Las contraseñas no coinciden");
                 return "editProfile";
             }
-            existingProfile.setPassword(encoder.encode(newPassword));
+        }
+        Profile profile = profileService
+                .findByToken(token_id)
+                .orElseThrow();
+
+        boolean valid = profileService.checkPassword(
+                profileFormEdit.getPassword(),
+                profile.getPassword());
+        if (!valid) {
+            bindingResult.rejectValue(
+                    "password",
+                    "password.incorrect",
+                    "Password incorrecto");
+            return "editProfile";
         }
 
-        existingProfile.setName(profileData.getName());
-        existingProfile.setBirthDate(profileData.getBirthDate());
-        existingProfile.setPhone(profileData.getPhone());
-        existingProfile.setEmail(profileData.getEmail());
-        existingProfile.setBloodType(profileData.getBloodType());
-        existingProfile.setAllergies(profileData.getAllergies());
-        existingProfile.setChronicDiseases(profileData.getChronicDiseases());
-        existingProfile.setMedications(profileData.getMedications());
-        existingProfile.setInsuranceProvider(profileData.getInsuranceProvider());
-        existingProfile.setInsuranceNumber(profileData.getInsuranceNumber());
-        existingProfile.setEmergencyContactName(profileData.getEmergencyContactName());
-        existingProfile.setEmergencyContactPhone(profileData.getEmergencyContactPhone());
-        existingProfile.setEmergencyContactRelation(profileData.getEmergencyContactRelation());
+        profileService.updateProfile(token_id, profileFormEdit);
 
-        if (!photo.isEmpty()) {
-
-            if (existingProfile.getPhotoUrl() != null) {
-
-                Path oldImage = Paths.get(
-                        System.getProperty("user.dir") +
-                                existingProfile.getPhotoUrl());
-
-                try {
-                    Files.deleteIfExists(oldImage);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            String folderPath = System.getProperty("user.dir") + "/uploads/profiles/";
-
-            File directory = new File(folderPath);
-
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
-
-            String filename = token + "_" + photo.getOriginalFilename();
-
-            File destination = new File(folderPath + filename);
-
-            try {
-                photo.transferTo(destination);
-            } catch (IllegalStateException | IOException e) {
-                e.printStackTrace();
-            }
-
-            existingProfile.setPhotoUrl("/uploads/profiles/" + filename);
-        }
-
-        profileService.update(existingProfile);
-        return "redirect:/profile/" + token;
+        return "redirect:/profile/" + token_id;
     }
 }

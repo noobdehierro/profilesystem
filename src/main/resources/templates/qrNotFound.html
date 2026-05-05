@@ -19,12 +19,12 @@
         El recurso que estás buscando no existe o fue eliminado.
       </p>
 
-      <div th:if="${token}" class="mb-6">
+      <div th:if="${token_id}" class="mb-6">
         <p class="text-sm text-gray-500">Token solicitado:</p>
 
         <p
           class="font-mono text-gray-800 bg-gray-100 rounded-lg px-3 py-2 mt-1"
-          th:text="${token}"
+          th:text="${token_id}"
         ></p>
       </div>
 

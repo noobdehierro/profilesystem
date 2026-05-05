@@ -108,11 +108,16 @@ public class QRController {
             }
         }
         byte[] zipBytes = baos.toByteArray();
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=qrs.zip")
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .contentLength(zipBytes.length)
-                .body(zipBytes);
+        final MediaType application_OCTET_STREAM2 = MediaType.APPLICATION_OCTET_STREAM;
+        if (application_OCTET_STREAM2 != null) {
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=qrs.zip")
+                    .contentType(application_OCTET_STREAM2)
+                    .contentLength(zipBytes.length)
+                    .body(zipBytes);
+        } else {
+            return null;
+        }
     }
 }

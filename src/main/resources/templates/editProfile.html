@@ -186,6 +186,7 @@
           method="post"
           enctype="multipart/form-data"
           th:action="@{/profile/{token}/update(token=${profile.token})}"
+          th:object="${profile}"
         >
           <!-- AVATAR -->
           <div class="flex justify-center mb-4">
@@ -195,13 +196,13 @@
               >
                 <img
                   id="preview"
-                  th:if="${profile.photoUrl != null}"
-                  th:src="@{${profile.photoUrl}}"
+                  th:if="${photoUrl != null}"
+                  th:src="@{${photoUrl}}"
                   class="w-full h-full object-cover rounded-full"
                 />
 
                 <span
-                  th:if="${profile.photoUrl == null}"
+                  th:if="${photoUrl == null}"
                   id="placeholder"
                   class="text-xs text-indigo-200/70"
                 >
@@ -211,11 +212,17 @@
 
               <input
                 type="file"
-                name="photo"
+                th:field="*{photo}"
                 accept="image/png,image/jpeg,image/webp"
                 class="hidden"
                 onchange="previewImage(event)"
               />
+
+              <div
+                th:if="${#fields.hasErrors('photo')}"
+                th:errors="*{photo}"
+                class="text-red-400 text-xs mt-1 text-center"
+              ></div>
             </label>
           </div>
           <!-- Personal -->
@@ -226,9 +233,15 @@
                 <label class="field-label">Nombre completo</label>
                 <input
                   name="name"
-                  th:value="${profile.name}"
+                  th:field="*{name}"
                   class="field-input"
+                  placeholder="Ej. Daniela Torres Méndez"
                 />
+                <div
+                  th:if="${#fields.hasErrors('name')}"
+                  th:errors="*{name}"
+                  class="text-red-400 text-xs mt-1"
+                ></div>
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>
@@ -236,17 +249,23 @@
                   <input
                     type="date"
                     name="birthDate"
-                    th:value="${profile.birthDate}"
+                    th:field="*{birthDate}"
                     class="field-input"
                   />
+                  <div
+                    th:if="${#fields.hasErrors('birthDate')}"
+                    th:errors="*{birthDate}"
+                    class="text-red-400 text-xs mt-1"
+                  ></div>
                 </div>
                 <div>
                   <label class="field-label">Teléfono</label>
-                  <input
-                    name="phone"
-                    th:value="${profile.phone}"
-                    class="field-input"
-                  />
+                  <input name="phone" th:field="*{phone}" class="field-input" />
+                  <div
+                    th:if="${#fields.hasErrors('phone')}"
+                    th:errors="*{phone}"
+                    class="text-red-400 text-xs mt-1"
+                  ></div>
                 </div>
               </div>
               <div>
@@ -254,9 +273,27 @@
                 <input
                   type="email"
                   name="email"
-                  th:value="${profile.email}"
+                  th:field="*{email}"
                   class="field-input"
                 />
+                <div
+                  th:if="${#fields.hasErrors('email')}"
+                  th:errors="*{email}"
+                  class="text-red-400 text-xs mt-1"
+                ></div>
+              </div>
+              <div>
+                <label class="field-label">Dirección</label>
+                <input
+                  name="address"
+                  th:field="*{address}"
+                  class="field-input"
+                />
+                <div
+                  th:if="${#fields.hasErrors('address')}"
+                  th:errors="*{address}"
+                  class="text-red-400 text-xs mt-1"
+                ></div>
               </div>
             </div>
           </div>
@@ -269,36 +306,56 @@
                 <label class="field-label">Tipo de sangre</label>
                 <input
                   name="bloodType"
-                  th:value="${profile.bloodType}"
+                  th:field="*{bloodType}"
                   class="field-input"
                 />
+                <div
+                  th:if="${#fields.hasErrors('bloodType')}"
+                  th:errors="*{bloodType}"
+                  class="text-red-400 text-xs mt-1"
+                ></div>
               </div>
               <div>
                 <label class="field-label">Alergias</label>
                 <textarea
                   name="allergies"
-                  th:text="${profile.allergies}"
+                  th:field="*{allergies}"
                   rows="2"
                   class="field-textarea resize-none"
                 ></textarea>
+                <div
+                  th:if="${#fields.hasErrors('allergies')}"
+                  th:errors="*{allergies}"
+                  class="text-red-400 text-xs mt-1"
+                ></div>
               </div>
               <div>
                 <label class="field-label">Enfermedades crónicas</label>
                 <textarea
                   name="chronicDiseases"
-                  th:text="${profile.chronicDiseases}"
+                  th:field="*{chronicDiseases}"
                   rows="2"
                   class="field-textarea resize-none"
                 ></textarea>
+                <div
+                  th:if="${#fields.hasErrors('chronicDiseases')}"
+                  th:errors="*{chronicDiseases}"
+                  class="text-red-400 text-xs mt-1"
+                ></div>
               </div>
               <div>
                 <label class="field-label">Medicamentos actuales</label>
                 <textarea
                   name="medications"
-                  th:text="${profile.medications}"
+                  th:field="*{medications}"
                   rows="2"
                   class="field-textarea resize-none"
                 ></textarea>
+                <div
+                  th:if="${#fields.hasErrors('medications')}"
+                  th:errors="*{medications}"
+                  class="text-red-400 text-xs mt-1"
+                ></div>
               </div>
             </div>
           </div>
@@ -311,17 +368,27 @@
                 <label class="field-label">Proveedor</label>
                 <input
                   name="insuranceProvider"
-                  th:value="${profile.insuranceProvider}"
+                  th:field="*{insuranceProvider}"
                   class="field-input"
                 />
+                <div
+                  th:if="${#fields.hasErrors('insuranceProvider')}"
+                  th:errors="*{insuranceProvider}"
+                  class="text-red-400 text-xs mt-1"
+                ></div>
               </div>
               <div>
                 <label class="field-label mono">Nº de póliza</label>
                 <input
                   name="insuranceNumber"
-                  th:value="${profile.insuranceNumber}"
+                  th:field="*{insuranceNumber}"
                   class="field-input mono"
                 />
+                <div
+                  th:if="${#fields.hasErrors('insuranceNumber')}"
+                  th:errors="*{insuranceNumber}"
+                  class="text-red-400 text-xs mt-1"
+                ></div>
               </div>
             </div>
           </div>
@@ -334,26 +401,41 @@
                 <label class="field-label">Nombre</label>
                 <input
                   name="emergencyContactName"
-                  th:value="${profile.emergencyContactName}"
+                  th:field="*{emergencyContactName}"
                   class="field-input"
                 />
+                <div
+                  th:if="${#fields.hasErrors('emergencyContactName')}"
+                  th:errors="*{emergencyContactName}"
+                  class="text-red-400 text-xs mt-1"
+                ></div>
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>
                   <label class="field-label">Teléfono</label>
                   <input
                     name="emergencyContactPhone"
-                    th:value="${profile.emergencyContactPhone}"
+                    th:field="*{emergencyContactPhone}"
                     class="field-input"
                   />
+                  <div
+                    th:if="${#fields.hasErrors('emergencyContactPhone')}"
+                    th:errors="*{emergencyContactPhone}"
+                    class="text-red-400 text-xs mt-1"
+                  ></div>
                 </div>
                 <div>
                   <label class="field-label">Relación</label>
                   <input
                     name="emergencyContactRelation"
-                    th:value="${profile.emergencyContactRelation}"
+                    th:field="*{emergencyContactRelation}"
                     class="field-input"
                   />
+                  <div
+                    th:if="${#fields.hasErrors('emergencyContactRelation')}"
+                    th:errors="*{emergencyContactRelation}"
+                    class="text-red-400 text-xs mt-1"
+                  ></div>
                 </div>
               </div>
             </div>
@@ -367,6 +449,7 @@
               <input
                 type="password"
                 name="password"
+                th:field="*{password}"
                 placeholder="Ingresa tu contraseña"
                 class="field-input"
               />
@@ -382,6 +465,7 @@
                 <input
                   type="password"
                   name="newPassword"
+                  th:field="*{newPassword}"
                   placeholder="Nueva contraseña (opcional)"
                   class="field-input"
                 />
@@ -391,6 +475,7 @@
                 <input
                   type="password"
                   name="confirmNewPassword"
+                  th:field="*{confirmNewPassword}"
                   placeholder="Repetir contraseña"
                   class="field-input"
                 />
